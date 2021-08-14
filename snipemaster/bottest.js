@@ -11,8 +11,8 @@ dotenv.config();
 const Web3 = web3;
 const httpprovider = process.env.HTTP_NODE;
 const Web3Client = new Web3(new Web3.providers.HttpProvider(httpprovider));
-const accountSid = '...';
-const authToken = '...';
+const accountSid = 'AC73a1d9f7c66e354500928e217246b1a6';
+const authToken = '950c96c583a9657599cf57f6dc407590';
 const client = twilio(accountSid, authToken);
 const app = express();
 const minABI = [  {    constant: true, inputs: [{ name: "_owner", type: "address" }], name: "balanceOf", outputs: [{ name: "balance", type: "uint256" }], type: "function", }, ];
@@ -178,8 +178,8 @@ const run = async () => {
       client.messages
         .create({
            body: 'Snipe successfully bought!',
-           from: '...',
-           to: '...'
+           from: '+18287053840',
+           to: '+19702348998'
          })
         .then(message => console.log(message.sid))
         .catch(err => console.log(err));
@@ -209,7 +209,7 @@ const run = async () => {
 
         const approveContract = new ethers.Contract(sellTokenIn, approveABI, account);
 
-        const approveResponse = await approveContract.approve(data.router, ethers.utils.parseUnits('1000.0', 18), {gasLimit: 100000, gasPrice: 5e9});
+        const approveResponse = await approveContract.approve(data.router, ethers.utils.parseUnits(format, 18), {gasLimit: 100000, gasPrice: 5e9});
 
         console.log('Approved!');
 
@@ -221,7 +221,6 @@ const run = async () => {
 
       setTimeout(() => sellSnipe(), 5000); //180000 3 minutes
       }
-
 
       getBalance();
 
@@ -277,8 +276,8 @@ const run = async () => {
       client.messages
         .create({
            body: 'Snipe successfully sold!',
-           from: '...',
-           to: '...'
+           from: '+18287053840',
+           to: '+19702348998'
          })
         .then(message => console.log(message.sid))
         .catch(err => console.log(err));
