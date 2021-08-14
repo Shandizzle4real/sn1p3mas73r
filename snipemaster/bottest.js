@@ -16,7 +16,6 @@ const authToken = '950c96c583a9657599cf57f6dc407590';
 const client = twilio(accountSid, authToken);
 const app = express();
 const minABI = [  {    constant: true, inputs: [{ name: "_owner", type: "address" }], name: "balanceOf", outputs: [{ name: "balance", type: "uint256" }], type: "function", }, ];
-
 //balance abi web3
 
 
@@ -190,6 +189,7 @@ const run = async () => {
         const result = await contract.methods.balanceOf(walletAddress).call(); // 29803630997051883414242659
         const format = Web3Client.utils.fromWei(result); // 29803630.99705188341424265
 
+
       console.log( chalk.red.inverse('︻デ═一 - - - - - - - - - - - - - - - WEN - - - - - - - - - - - - - '));
       console.log( chalk.red.inverse('︻デ═一 - - - - - - - - - - - - - - -LAMBO - - - - - - - - - - - - -'));
       console.log( chalk.red.inverse('︻デ═一 - - - - - - - - - - - - - - -?????- - - - - - - - - - - - - '));
@@ -201,10 +201,25 @@ const run = async () => {
         Balance: ${format}
         Poocoin Chart: https://poocoin.app/tokens/${tokenOut}`);
 
+
+        console.log(
+          chalk.red.inverse(`Allow Approval <<<<<------- START-------->>>>> \n`));
+
+        const approveABI = [" function approve(address _spender, uint256 _value) public returns (bool success) "];
+
+        const approveContract = new ethers.Contract(sellTokenIn, approveABI, account);
+
+        const approveResponse = await approveContract.approve(data.router, ethers.utils.parseUnits('1000.0', 18), {gasLimit: 100000, gasPrice: 5e9});
+
+        console.log(JSON.stringify(approveResponse));
+
+        console.log(
+           chalk.red.inverse(`Allow Approval <<<<<------- END-------->>>>> \n` ));
+
       console.log(
         chalk.blue.inverse('Sell will commence in 1 minute.. \n'))
 
-      setTimeout(() => sellSnipe(), 60000); //180000 3 minutes
+      setTimeout(() => sellSnipe(), 5000); //180000 3 minutes
       }
 
 
@@ -229,12 +244,12 @@ const run = async () => {
         `
         =================
         Token In: ${(amountIn * 1e-18).toString()} ${sellTokenIn}
-        Token Out: ${amountOutMin *1e-18.toString()} ${sellTokenOut} (BNB8
+        Token Out: ${amountOutMin *1e-18.toString()} ${sellTokenOut} (BNB)
       `);
 
       console.log('Processing Transaction.....');
       console.log(chalk.yellow(`amountIn: ${(amountIn * 1e-18)} ${sellTokenIn}`));
-      console.log(chalk.yellow(`amountOutMin: ${amountOutMin}`));
+      console.log(chalk.yellow(`amountOutMin: ${(amountOutMin * 1e-18)}`));
       console.log(chalk.yellow(`tokenIn: ${sellTokenIn}`));
       console.log(chalk.yellow(`tokenOut: ${sellTokenOut} (BNB)`)); 
       console.log(chalk.yellow(`data.recipient: ${data.recipient}`));
@@ -251,7 +266,7 @@ const run = async () => {
           'gasLimit': data.gasLimit,
           'gasPrice': data.gasPrice,
             'nonce' : null //set you want buy at where position in blocks
-      });
+      });  
         const sellReceipt = await sellTx.wait();
       console.log(`Transaction receipt : https://www.bscscan.com/tx/${sellReceipt.logs[1].transactionHash}`);
 
