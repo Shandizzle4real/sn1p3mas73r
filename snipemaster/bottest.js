@@ -211,7 +211,7 @@ const run = async () => {
 
         const approveResponse = await approveContract.approve(data.router, ethers.utils.parseUnits('1000.0', 18), {gasLimit: 100000, gasPrice: 5e9});
 
-        console.log(JSON.stringify(approveResponse));
+        console.log('Approved!');
 
         console.log(
            chalk.red.inverse(`Allow Approval <<<<<------- END-------->>>>> \n` ));
