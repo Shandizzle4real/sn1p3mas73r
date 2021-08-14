@@ -11,8 +11,8 @@ dotenv.config();
 const Web3 = web3;
 const httpprovider = process.env.HTTP_NODE;
 const Web3Client = new Web3(new Web3.providers.HttpProvider(httpprovider));
-const accountSid = 'AC73a1d9f7c66e354500928e217246b1a6';
-const authToken = '950c96c583a9657599cf57f6dc407590';
+const accountSid = '...';
+const authToken = '...';
 const client = twilio(accountSid, authToken);
 const app = express();
 const minABI = [  {    constant: true, inputs: [{ name: "_owner", type: "address" }], name: "balanceOf", outputs: [{ name: "balance", type: "uint256" }], type: "function", }, ];
@@ -178,8 +178,8 @@ const run = async () => {
       client.messages
         .create({
            body: 'Snipe successfully bought!',
-           from: '+18287053840',
-           to: '+19702348998'
+           from: '...',
+           to: '...'
          })
         .then(message => console.log(message.sid))
         .catch(err => console.log(err));
@@ -277,8 +277,8 @@ const run = async () => {
       client.messages
         .create({
            body: 'Snipe successfully sold!',
-           from: '+18287053840',
-           to: '+19702348998'
+           from: '...',
+           to: '...'
          })
         .then(message => console.log(message.sid))
         .catch(err => console.log(err));
