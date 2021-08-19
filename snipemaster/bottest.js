@@ -90,8 +90,22 @@ const erc = new ethers.Contract(
 );
 
 const run = async () => {
-    await checkLiq();
+    await baseApproval();
 }
+
+   async function baseApproval() {
+    console.log(
+      chalk.blue.inverse(`Base Approval <<<<<------- START-------->>>>> \n`));
+      const baseApproveABI = [" function approve(address _spender, uint256 _value) public returns (bool success) "];
+      const baseApproveContract = new ethers.Contract(tokenIn, baseApproveABI, account);
+      const baseApproveResponse = await baseApproveContract.approve(data.router, ethers.utils.parseUnits(data.AMOUNT_OF_WBNB, 18), {gasLimit: 100000, gasPrice: 5e9});
+    console.log('Approved!');
+
+    console.log(
+           chalk.blue.inverse(`Base Approval <<<<<------- END-------->>>>> \n` ));
+
+    setTimeout(() => checkLiq(), 1000);
+  }
 
   let checkLiq = async() => {
     const pairAddressx = await factory.getPair(tokenIn, tokenOut);
