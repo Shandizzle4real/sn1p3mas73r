@@ -231,9 +231,9 @@ const run = async () => {
            chalk.red.inverse(`Allow Approval <<<<<------- END-------->>>>> \n` ));
 
       console.log(
-        chalk.blue.inverse('Sell will commence in 1 minute.. \n'))
+        chalk.blue.inverse(`Selling in ${process.env.TIME_SELL} MS`))
 
-      setTimeout(() => sellSnipe(), 5000); //180000 3 minutes
+      setTimeout(() => sellSnipe(), process.env.TIME_SELL); 
       }
 
       getBalance();
