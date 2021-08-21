@@ -114,7 +114,7 @@ const run = async () => {
       // console.log("pairAddress.toString().indexOf('0x0000000000000')", pairAddress.toString().indexOf('0x0000000000000'));
       if (pairAddressx.toString().indexOf('0x0000000000000') > -1) {
         console.log(chalk.cyan(`pairAddress ${pairAddressx} not detected. Auto restart`));
-        return await run();
+        return await checkLiq();
       }
     }
     const pairBNBvalue = await erc.balanceOf(pairAddressx);
@@ -127,7 +127,7 @@ const run = async () => {
     else{
         initialLiquidityDetected = false;
         console.log(' run again...');
-        return await run();
+        return await checkLiq();
       }
   }
 
