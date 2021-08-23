@@ -355,7 +355,7 @@ const run = async () => {
         const sellReceipt = await sellTx.wait();
       console.log(`Transaction receipt : https://www.bscscan.com/tx/${sellReceipt.logs[1].transactionHash}`);
 
-            setTimeout(() => sellbreakSnipe(), 1000);
+            sellbreakSnipe();
       };
       }
 
