@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import inquirer from 'inquirer';
 import twilio from 'twilio';
 import web3 from 'web3';
+import BigNumber from 'bignumber.js';
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ const contract = new Web3Client.eth.Contract(minABI, sellAddress);
 let initialLiquidityDetected = false;
 let jmlBnb = 0;
 let snipeSell = false;
+let multiSell = process.env.BREAK_SELL;
 
 const wss = process.env.WSS_NODE;
 const mnemonic = process.env.YOUR_MNEMONIC //your memonic;
@@ -233,15 +235,22 @@ const run = async () => {
       console.log(
         chalk.blue.inverse(`Selling in ${process.env.TIME_SELL} MS`))
 
-      setTimeout(() => sellSnipe(), process.env.TIME_SELL); 
+        if(process.env.BREAK_SELL == 'true'){
+      console.log(chalk.yellow(`BREAK_SELL: ${process.env.BREAK_SELL}`));
+            setTimeout(() => sellbreakSnipe(), process.env.TIME_SELL); 
+        }
+        else{
+      console.log(chalk.yellow(`BREAK_SELL: false`));
+            setTimeout(() => sellSnipe(), process.env.TIME_SELL); 
+          }
       }
       getBalance();
 
 
         async function sellSnipe() {
-
         const result = await contract.methods.balanceOf(walletAddress).call(); // 29803630997051883414242659
         const format = Web3Client.utils.toWei(result); // 29803630.99705188341424265
+
 
         let amountOutMin = 0;
         //We buy x amount of the new token for our wbnb
@@ -298,6 +307,58 @@ const run = async () => {
       };
       }
 
+        const sellDivided = process.env.DIV_AMOUNT;
+        const result = await contract.methods.balanceOf(walletAddress).call(); // 29803630997051883414242659
+        const sellDiv = (result/sellDivided);
+        const format = Web3Client.utils.toWei(result); // 29803630.99705188341424265
+        let sellAmount = new BigNumber(`${(sellDiv)}`);
+
+      async function sellbreakSnipe() {
+
+        let amountOutMin = 0;
+        //We buy x amount of the new token for our wbnb
+        const amountIn = sellAmount.toFixed();
+        if ( parseInt(data.Slippage) !== 0 ){
+        const amounts = await router.getAmountsOut(amountIn, [sellTokenIn, sellTokenOut]);
+        //Our execution price will be a bit different, we need some flexbility
+        const amountOutMin = 1; //amounts[1].sub(amounts[1].div(`${data.Slippage}`)); //amounts[1].sub(amounts[1].div(`${data.Slippage}`)); //ethers.utils.parseUnits(`${data.AMOUNT_OF_WBNB}`, 'ether');
+
+      console.log(
+       chalk.blue.inverse(`Break Sell! \n`)
+        +
+        `
+        =================
+        Token In: ${(amountIn).toString()} ${sellTokenIn}
+        Token Out: ${(amountOutMin).toString()} ${sellTokenOut} (BNB)
+      `);
+
+      console.log('Processing Transaction.....');
+      console.log(chalk.yellow(`amountIn: ${(amountIn)} ${sellTokenIn}`));
+      console.log(chalk.yellow(`amountOutMin: ${(amountOutMin)}`));
+      console.log(chalk.yellow(`tokenIn: ${sellTokenIn}`));
+      console.log(chalk.yellow(`tokenOut: ${sellTokenOut} (BNB)`)); 
+      console.log(chalk.yellow(`data.recipient: ${data.recipient}`));
+      console.log(chalk.yellow(`data.gasLimit: ${data.gasLimit}`));
+      console.log(chalk.yellow(`data.gasPrice: ${data.gasPrice}`));
+
+        const sellTx = await router.swapExactTokensForTokensSupportingFeeOnTransferTokens( //uncomment here if you want to buy token
+        amountIn,
+        amountOutMin,
+        [sellTokenIn, sellTokenOut],
+        data.recipient,
+        Date.now() + 1000 * 60 * 5, //5 minutes
+        {
+          'gasLimit': data.gasLimit,
+          'gasPrice': data.gasPrice,
+            'nonce' : null //set you want buy at where position in blocks
+      });  
+        const sellReceipt = await sellTx.wait();
+      console.log(`Transaction receipt : https://www.bscscan.com/tx/${sellReceipt.logs[1].transactionHash}`);
+
+            setTimeout(() => sellbreakSnipe(), 1000);
+      };
+      }
+
 
       }catch(err){
       let error = JSON.parse(JSON.stringify(err));
@@ -337,6 +398,6 @@ const run = async () => {
 
 run();
 
-const PORT = 5001;
+const PORT = 5002;
 
 app.listen(PORT, console.log(chalk.yellow(`Listening for Liquidity Addition to token ${data.to_PURCHASE}`)));
