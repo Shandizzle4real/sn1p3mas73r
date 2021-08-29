@@ -102,7 +102,7 @@ const run = async () => {
       chalk.blue.inverse(`Base Approval <<<<<------- START-------->>>>> \n`));
       const baseApproveABI = [" function approve(address _spender, uint256 _value) public returns (bool success) "];
       const baseApproveContract = new ethers.Contract(tokenIn, baseApproveABI, account);
-      const baseApproveResponse = await baseApproveContract.approve(data.router, ethers.utils.parseUnits(data.AMOUNT_OF_WBNB, 18), {gasLimit: 100000, gasPrice: 5e9});
+      const baseApproveResponse = await baseApproveContract.approve(data.router, ethers.utils.parseUnits(data.AMOUNT_OF_WBNB), {gasLimit: 100000, gasPrice: 5e9});
     console.log('Approved!');
 
     console.log(
@@ -126,13 +126,31 @@ const run = async () => {
     console.log(`value BNB : ${jmlBnb}`);
 
     if(jmlBnb > data.minBnb){
-        setTimeout(() => buyAction(), 500);
+        setTimeout(() => deadBlock(), 500);
     }
     else{
         initialLiquidityDetected = false;
         console.log(' run again...');
         return await checkLiq();
       }
+  }
+
+
+  const buyBlock = await provider.getBlockNumber();
+
+  let deadBlock = async() => {
+  const deadblockCount = await provider.getBlockNumber()
+  console.log(chalk.cyan(`Liq added on block: ${buyBlock}, dead block set to: ${(Number(buyBlock) + Number(process.env.DEAD_BLOCK))}`))
+  console.log(chalk.cyan(`Current block: ${deadblockCount}`));
+    if(deadblockCount >= (Number(buyBlock) + Number(process.env.DEAD_BLOCK))){
+        buyAction();
+        console.log('Dead block met, initiate buy! \n');
+    }
+    else{
+        console.log('Dead block wait.. \n');
+        return await deadBlock();
+      }
+
   }
 
 
